@@ -3,13 +3,14 @@ import Aux from '../../hoc/Aux';
 import Burger from '../Burger/Burger';
 import BuildControls from "../Burger/BuildControls/BuildControls";
 import classes from '../Burger/BuildControls/BuildControls.module.css';
-import { object } from "prop-types";
+import Modal from '../UI/Modal/Modal';
+import OrderSummary from "../../components/Burger/OrderSummary/OrderSummary";
 
 const INGREDIENT_PRICES = {
     salad: 0.5,
     cheese: 0.4,
-    meat: 1.3,
-    bacon: 0.7
+    bacon: 0.7,
+    beef: 1.3
 };
 
 class BurgerBuilder extends Component {
@@ -21,8 +22,13 @@ class BurgerBuilder extends Component {
             beef: 0,
         },
         totalPrice: 4,
-        purchasable: false
+        purchasable: false,
+        orderIsClick: false
     }
+
+    OrderButtonHandler = () => {
+        this.setState({orderIsClick: true});
+    };
 
     // check if there are ingredients in the burger. If not, then cannot order
     updatePurchaseState(ingredients) {
@@ -69,10 +75,25 @@ class BurgerBuilder extends Component {
         this.updatePurchaseState(updatedIngredients);
     }
 
+    purchaseCancelHandler = () => (
+        this.setState({orderIsClick: false})
+    );
+
+    purchaseContinueHandler =() => {
+        alert('continue');
+    }
 
     render(){
         return(
             <Aux>
+                <Modal show={this.state.orderIsClick} modalClosed={this.purchaseCancelHandler}> 
+                <OrderSummary 
+                    price={this.state.totalPrice}
+                    ingredients={this.state.ingredients}
+                    purchaseCancelled ={this.purchaseCancelHandler}
+                    purchaseContinued = {this.purchaseContinueHandler}
+                />
+                </Modal>
                 <Burger ingredients={this.state.ingredients}/>
 
                 <p>Current Price: {this.state.totalPrice.toFixed(2)}</p>
@@ -85,8 +106,11 @@ class BurgerBuilder extends Component {
                     purchasable={this.state.purchasable}
                 />
                 <button 
-                className={classes.OrderButton}
-                disabled={!this.state.purchasable}>ORDER NOW</button>
+                    className={classes.OrderButton}
+                    disabled={!this.state.purchasable}
+                    onClick={this.OrderButtonHandler}>
+                        ORDER NOW
+                </button>
             </Aux>
         );
     }
